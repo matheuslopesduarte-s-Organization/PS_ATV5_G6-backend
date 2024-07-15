@@ -15,7 +15,7 @@
     @endif
 
     <p>verifique seu email</p>
-    <form method="POST" action="/register/emailVerify">
+    <form method="POST" action="{{ route('register.emailVerify.submit') }}">
         @csrf
         <input type="text" id="codigo" name="token"><br>
         <button type="submit">Verificar</button>

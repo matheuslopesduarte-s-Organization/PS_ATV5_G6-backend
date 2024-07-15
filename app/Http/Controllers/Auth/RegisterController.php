@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers\Auth;
 
@@ -14,13 +14,9 @@ use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
-    public function showRegisterForm()
-    {
-        return view('register');
-    }
-
     public function register(Request $request)
     {
+        /*
         $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:100|unique:usuarios,email',
@@ -29,27 +25,85 @@ class RegisterController extends Controller
             'username' => 'required|string|max:50|unique:usuarios,username',
             'birthdate' => 'required|date|before:today'
         ]);
+        */
+        
+        switch ($request->name) {
+            case null:
+                return back()->withErrors(['name' => 'name is required']);
+            case !is_string($request->name):
+                return back()->withErrors(['name' => 'name must be a string']);
+            case strlen($request->name) > 100:
+                return back()->withErrors(['name' => 'name is too long']);
+        }
+        switch ($request->email) {
+            case null:
+                return back()->withErrors(['email' => 'email is required']);
+            case !is_string($request->email):
+                return back()->withErrors(['email' => 'email must be a string']);
+            case strlen($request->email) > 100:
+                return back()->withErrors(['email' => 'email is too long']);
+            case Usuario::where('email', $request->email)->exists():
+                return back()->withErrors(['email' => 'email already in use']);
+        }
+
+        $request->cpf = preg_replace('/[^0-9]/', '', $request->cpf);
+        $cpfBase = substr($request->cpf, 0, 9);
+        switch ($request->cpf) {
+            case null:
+                return back()->withErrors(['cpf' => 'cpf is required']);
+            case !is_string($request->cpf):
+                return back()->withErrors(['cpf' => 'cpf must be a string']);
+            case strlen($request->cpf) != 11:
+                return back()->withErrors(['cpf' => 'invalid cpf']);
+            case !($cpfBase . VerificaCpf::calcularVerificador($cpfBase)):
+                return back()->withErrors(['cpf' => 'invalid cpf']);
+            case Usuario::where('cpf', $request->cpf)->exists():
+                return back()->withErrors(['cpf' => 'cpf already in use']);
+        }
+
+        switch ($request->password) {
+            case null:
+                return back()->withErrors(['password' => 'password is required']);
+            case !is_string($request->password):
+                return back()->withErrors(['password' => 'password must be a string']);
+            case strlen($request->password) < 8:
+                return back()->withErrors(['password' => 'password is too short']);
+        }
+
+        switch ($request->username) {
+            case null:
+                return back()->withErrors(['username' => 'username is required']);
+            case !is_string($request->username):
+                return back()->withErrors(['username' => 'username must be a string']);
+            case strlen($request->username) > 50:
+                return back()->withErrors(['username' => 'username is too long']);
+            case !preg_match('/^[a-zA-Z0-9_]*$/', $request->username):
+                return back()->withErrors(['username' => 'invalid characters in username']);
+            case Usuario::where('username', $request->username)->exists():
+                return back()->withErrors(['username' => 'username already in use']);
+        }
+
+        switch ($request->birthdate) {
+            case null:
+                return back()->withErrors(['birthdate' => 'birthdate is required']);
+            case Carbon::parse($request->birthdate)->year < 1900:
+                return back()->withErrors(['birthdate' => 'invalid date']);
+            case Carbon::parse($request->birthdate)->isFuture():
+                return back()->withErrors(['birthdate' => 'invalid date']);
+            case !Carbon::parse($request->birthdate):
+                return back()->withErrors(['birthdate' => 'invalid date']);
+        }
 
         $birthdate = Carbon::parse($request->birthdate);
         $age = $birthdate->age;
 
-        if($age < 18){
+        if ($age < 18) {
             session(['parentRegister' => $request->all()]);
             return redirect()->route('parentRegister');
-        } 
-        if(!preg_match('/^[a-zA-Z0-9_]*$/', $request->username)){
-            return back()->withErrors(['username' => 'invalid characters in username']);
         }
 
-        
         $usuario = new Usuario();
 
-        $request->cpf = preg_replace('/[^0-9]/', '', $request->cpf);
-        $cpfBase = substr($request->cpf, 0, 9);
-
-        if($request->cpf != $cpfBase . VerificaCpf::calcularVerificador($cpfBase)){
-            return back()->withErrors(['cpf' => 'invalid cpf']);
-        }
         $caracteres = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $codigo = '';
 
@@ -59,10 +113,10 @@ class RegisterController extends Controller
 
         $misc = [
             'email_verified' => false,
-            'email_verification_tokens' => [ 
+            'email_verification_tokens' => [
                 [
-                'token' => hash('sha256', $codigo),
-                'expires_at' => Carbon::now()->addHours(24)->toDateTimeString()
+                    'token' => hash('sha256', $codigo),
+                    'expires_at' => Carbon::now()->addHours(24)->toDateTimeString()
                 ]
             ],
             'status' => 'active',
@@ -98,23 +152,26 @@ class RegisterController extends Controller
             'token' => 'required|string|size:7'
         ]);
 
-        if(!session()->has('needEmailVerification')){
+        if (!session()->has('needEmailVerification')) {
             return redirect()->route('login');
         }
 
         $usuario = Usuario::where('email', session('needEmailVerification'))->first();
-        
+
         $userTokens = json_decode($usuario->misc, true)['email_verification_tokens'];
 
-        for($i = 0; $i < count($userTokens); $i++){
-            if($userTokens[$i]['token'] == hash('sha256', $request->token)){
-                if(Carbon::parse($userTokens[$i]['expires_at'])->isPast()){
+        for ($i = 0; $i < count($userTokens); $i++) {
+            if ($userTokens[$i]['token'] == hash('sha256', $request->token)) {
+                if (Carbon::parse($userTokens[$i]['expires_at'])->isPast()) {
                     return back()->withErrors(['token' => 'expired token']);
                 }
                 $usuario->misc = json_encode(
                     array_merge(
-                        json_decode($usuario->misc, true), 
-                        ['email_verified' => true]
+                        json_decode($usuario->misc, true),
+                        [
+                            'email_verified' => true,
+                            'email_verification_tokens' => null
+                        ]
                     )
                 );
                 $usuario->save();
@@ -124,10 +181,4 @@ class RegisterController extends Controller
         }
         return back()->withErrors(['token' => 'invalid token']);
     }
-
-    public function showEmailVerify()
-    {
-        return view('verifyEmail');
-    }
-    
 }

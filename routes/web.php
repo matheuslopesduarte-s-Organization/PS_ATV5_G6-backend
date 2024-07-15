@@ -10,13 +10,19 @@ Route::get('/', function () {
     return view('home');
 })->name('home')->middleware(CheckLogin::class);
 
-Route::get('/login', [Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/login', function() {
+    return view('login');
+})->name('login');
 Route::post('/login', [Auth\LoginController::class, 'login'])->name('login.submit');
 
 Route::any('/logout', [Auth\LoginController::class, 'logout'])->name('logout');
 
-Route::get('/register', [Auth\RegisterController::class, 'showRegisterForm'])->name('register');
+Route::get('/register', function() {
+    return view('register');
+})->name('register');
 Route::post('/register', [Auth\RegisterController::class, 'register'])->name('register.submit');
 
-Route::get('/register/emailVerify', [Auth\RegisterController::class, 'showEmailVerify'])->name('register.emailVerify');
+Route::get('/register/emailVerify', function() {
+    return view('emailVerify');
+})->name('register.emailVerify');
 Route::post('/register/emailVerify', [Auth\RegisterController::class, 'emailVerify'])->name('register.emailVerify.submit');

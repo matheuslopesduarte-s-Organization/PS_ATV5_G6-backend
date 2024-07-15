@@ -6,7 +6,6 @@ class VerificaCpf
 {
     public static function calcularVerificador($baseCpf)
     {
-
         /*
         Cálculo do primeiro dígito verificador:
 
@@ -24,7 +23,7 @@ class VerificaCpf
         Novamente, calcula-se o resto da divisão da soma por 11.
         Se o resto for menor que 2, o segundo dígito verificador é 0. Caso contrário, é 11 menos esse resto.
 
-        fonte: 
+        fonte: https://chatgpt.com/share/119aebf8-5659-4e1a-a071-176745a88caf
         */
 
         // primeiro digito

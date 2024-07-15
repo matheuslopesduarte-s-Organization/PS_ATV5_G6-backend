@@ -14,9 +14,9 @@
                 <button class="menu-button">
                     <span class="menu-icon material-symbols-outlined">menu</span>
                 </button>
-                <RouterLink to="/" class="menu-home">
-                    <span class="menu-home-span">home</span>
-                </RouterLink>
+                <div  class="menu-home">
+                    <a href="{{ route('home') }}" class="menu-home-span">home</a>
+                </div>
             </div>
 
             <form class="search-bar" @submit.prevent="search" ref="search_form">

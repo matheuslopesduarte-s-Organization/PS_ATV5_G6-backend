@@ -18,14 +18,31 @@ class CheckLogin
     {
         if($request->session()->has('user')){
             $user = Usuario::find(session('user')['id']);
-            if($user->status != 'active'){
+            if(json_decode($user->misc, true)['status'] != 'active'){
                 return redirect()->route('login')->withErrors(['blocked' => 'blocked']);
             } 
-            if($user->misc['email_verified'] == false){
+            if(json_decode($user->misc, true)['email_verified'] == false){
                 session('needVerify', $user->email);
                 session()->forget('user');
                 return redirect()->route('register.emailVerify');
             }
+            
+            $userPictures = json_decode($user->misc, true)['images'];
+            $max = 0;
+            foreach($userPictures as $key => $value){
+                if($key != 'def'){
+                    $key = intval($key);
+                    if($key > $max){
+                        $max = $key;
+                    }
+                }
+            }
+            if($max == 0){
+                session('user')['image'] = $userPictures['def'];
+            } else {
+                session('user')['image'] = $userPictures[$max];
+            }
+            
 
         }
         if ($request->session()->has('needEmailVerification')) {

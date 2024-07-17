@@ -27,7 +27,7 @@ Route::get('/register', function() {
 Route::post('/register', [Auth\RegisterController::class, 'register'])->name('register.submit');
 
 Route::get('/register/emailVerify', function() {
-    return view('emailVerify');
+    return view('verifyEmail');
 })->name('register.emailVerify');
 Route::post('/register/emailVerify', [Auth\RegisterController::class, 'emailVerify'])->name('register.emailVerify.submit');
 

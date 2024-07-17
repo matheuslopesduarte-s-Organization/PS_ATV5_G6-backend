@@ -1,14 +1,10 @@
-<!-- resources/views/auth/login.blade.php -->
+@extends('layouts.layout')
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-@if ($errors->any())
+@section('title', 'login')
+
+@section('content')
+<center>
+    @if ($errors->any())
         <div>
             <ul>
                 @foreach ($errors->all() as $error)
@@ -19,8 +15,6 @@
     @endif
     <form method="POST" action="/login">
         @csrf
-
-        
 
         <div>
             <label for="email">E-mail</label>
@@ -40,5 +34,7 @@
 
         <button type="submit">Login</button>
     </form>
-</body>
-</html>
+    <a href="{{ route('register') }}">Registre-se</a>
+</center>
+
+@endsection

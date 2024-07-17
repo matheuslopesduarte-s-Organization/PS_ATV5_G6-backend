@@ -25,8 +25,8 @@ class CreateUserPicture
         $background_color = imagecolorallocate($image, $random_color[0], $random_color[1], $random_color[2]);
         imagefill($image, 0, 0, $background_color);
         $text_color = imagecolorallocate($image, 255, 255, 255);
-        $font_path = public_path('fonts/Roboto-Regular.ttf');  
-        $font_size = 400; 
+        $font_path = public_path('fonts/Roboto-Regular.ttf');
+        $font_size = 400;
         $text_box = imagettfbbox($font_size, 0, $font_path, strtoupper(substr($username, 0, 1)));
         $text_width = $text_box[2] - $text_box[0];
         $text_height = $text_box[3] - $text_box[5];

@@ -48,6 +48,7 @@ class RegisterController extends Controller
 
         $request->cpf = preg_replace('/[^0-9]/', '', $request->cpf);
         $cpfBase = substr($request->cpf, 0, 9);
+        $verificador = substr($request->cpf, 9, 11);
         switch ($request->cpf) {
             case null:
                 return back()->withErrors(['cpf' => 'cpf is required']);
@@ -55,7 +56,7 @@ class RegisterController extends Controller
                 return back()->withErrors(['cpf' => 'cpf must be a string']);
             case strlen($request->cpf) != 11:
                 return back()->withErrors(['cpf' => 'invalid cpf']);
-            case !($cpfBase . VerificaCpf::calcularVerificador($cpfBase)):
+            case !($verificador == VerificaCpf::calcularVerificador($cpfBase)):
                 return back()->withErrors(['cpf' => 'invalid cpf']);
             case Usuario::where('cpf', $request->cpf)->exists():
                 return back()->withErrors(['cpf' => 'cpf already in use']);

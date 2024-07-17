@@ -17,7 +17,7 @@
         @csrf
 
         <div>
-            <label for="email">E-mail</label>
+            <label for="email">E-mail ou usuario</label>
             <input id="email" type="text" name="identifier" value="{{ old('email') }}" required autofocus>
             @error('identifier')
                 <span>{{ $message }}</span>

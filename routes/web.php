@@ -12,8 +12,6 @@ Route::middleware(CheckLogin::class)->group(function () {
     })->name('home');
 });
 
-
-
 Route::get('/login', function() {
     return view('login');
 })->name('login');

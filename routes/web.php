@@ -6,9 +6,13 @@ use App\Http\Middleware\CheckLogin;
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-})->name('home')->middleware(CheckLogin::class);
+Route::middleware(CheckLogin::class)->group(function () {
+    Route::get('/', function () {
+        return view('home');
+    })->name('home');
+});
+
+
 
 Route::get('/login', function() {
     return view('login');
@@ -26,3 +30,5 @@ Route::get('/register/emailVerify', function() {
     return view('emailVerify');
 })->name('register.emailVerify');
 Route::post('/register/emailVerify', [Auth\RegisterController::class, 'emailVerify'])->name('register.emailVerify.submit');
+
+require __DIR__ .'/LivrosRoute.php';

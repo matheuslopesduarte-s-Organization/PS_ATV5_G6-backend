@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\MeuEmail;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Carbon\Carbon;
@@ -14,7 +13,11 @@ use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
-    public function register(Request $request)
+    public function create()
+    {
+        return view('register');
+    }
+    public function store(Request $request)
     {
         /*
         $request->validate([
@@ -26,24 +29,33 @@ class RegisterController extends Controller
             'birthdate' => 'required|date|before:today'
         ]);
         */
-        
+
         switch ($request->name) {
             case null:
-                return back()->withErrors(['name' => 'name is required']);
+                return back()->withInput()->withErrors(['name' => 'name is required']);
             case !is_string($request->name):
-                return back()->withErrors(['name' => 'name must be a string']);
+                return back()->withInput()->withErrors(['name' => 'name must be a string']);
             case strlen($request->name) > 100:
-                return back()->withErrors(['name' => 'name is too long']);
+                return back()->withInput()->withErrors(['name' => 'name is too long']);
         }
         switch ($request->email) {
             case null:
-                return back()->withErrors(['email' => 'email is required']);
+                return back()->withInput()->withErrors(['email' => 'email is required']);
             case !is_string($request->email):
-                return back()->withErrors(['email' => 'email must be a string']);
+                return back()->withInput()->withErrors(['email' => 'email must be a string']);
             case strlen($request->email) > 100:
-                return back()->withErrors(['email' => 'email is too long']);
+                return back()->withInput()->withErrors(['email' => 'email is too long']);
             case Usuario::where('email', $request->email)->exists():
-                return back()->withErrors(['email' => 'email already in use']);
+                return back()->withInput()->withErrors(['email' => 'email already in use']);
+        }
+
+        switch ($request->password) {
+            case null:
+                return back()->withInput()->withErrors(['password' => 'password is required']);
+            case !is_string($request->password):
+                return back()->withInput()->withErrors(['password' => 'password must be a string']);
+            case strlen($request->password) < 8:
+                return back()->withInput()->withErrors(['password' => 'password is too short']);
         }
 
         $request->cpf = preg_replace('/[^0-9]/', '', $request->cpf);
@@ -51,48 +63,39 @@ class RegisterController extends Controller
         $verificador = substr($request->cpf, 9, 11);
         switch ($request->cpf) {
             case null:
-                return back()->withErrors(['cpf' => 'cpf is required']);
+                return back()->withInput()->withErrors(['cpf' => 'cpf is required']);
             case !is_string($request->cpf):
-                return back()->withErrors(['cpf' => 'cpf must be a string']);
+                return back()->withInput()->withErrors(['cpf' => 'cpf must be a string']);
             case strlen($request->cpf) != 11:
-                return back()->withErrors(['cpf' => 'invalid cpf']);
+                return back()->withInput()->withErrors(['cpf' => 'invalid cpf']);
             case !($verificador == VerificaCpf::calcularVerificador($cpfBase)):
-                return back()->withErrors(['cpf' => 'invalid cpf']);
+                return back()->withInput()->withErrors(['cpf' => 'invalid cpf']);
             case Usuario::where('cpf', $request->cpf)->exists():
-                return back()->withErrors(['cpf' => 'cpf already in use']);
-        }
-
-        switch ($request->password) {
-            case null:
-                return back()->withErrors(['password' => 'password is required']);
-            case !is_string($request->password):
-                return back()->withErrors(['password' => 'password must be a string']);
-            case strlen($request->password) < 8:
-                return back()->withErrors(['password' => 'password is too short']);
+                return back()->withInput()->withErrors(['cpf' => 'cpf already in use']);
         }
 
         switch ($request->username) {
             case null:
-                return back()->withErrors(['username' => 'username is required']);
+                return back()->withInput()->withErrors(['username' => 'username is required']);
             case !is_string($request->username):
-                return back()->withErrors(['username' => 'username must be a string']);
+                return back()->withInput()->withErrors(['username' => 'username must be a string']);
             case strlen($request->username) > 50:
-                return back()->withErrors(['username' => 'username is too long']);
+                return back()->withInput()->withErrors(['username' => 'username is too long']);
             case !preg_match('/^[a-zA-Z0-9_]*$/', $request->username):
-                return back()->withErrors(['username' => 'invalid characters in username']);
+                return back()->withInput()->withErrors(['username' => 'invalid characters in username']);
             case Usuario::where('username', $request->username)->exists():
-                return back()->withErrors(['username' => 'username already in use']);
+                return back()->withInput()->withErrors(['username' => 'username already in use']);
         }
 
         switch ($request->birthdate) {
             case null:
-                return back()->withErrors(['birthdate' => 'birthdate is required']);
+                return back()->withInput()->withErrors(['birthdate' => 'birthdate is required']);
             case Carbon::parse($request->birthdate)->year < 1900:
-                return back()->withErrors(['birthdate' => 'invalid date']);
+                return back()->withInput()->withErrors(['birthdate' => 'invalid date']);
             case Carbon::parse($request->birthdate)->isFuture():
-                return back()->withErrors(['birthdate' => 'invalid date']);
+                return back()->withInput()->withErrors(['birthdate' => 'invalid date']);
             case !Carbon::parse($request->birthdate):
-                return back()->withErrors(['birthdate' => 'invalid date']);
+                return back()->withInput()->withErrors(['birthdate' => 'invalid date']);
         }
 
         $birthdate = Carbon::parse($request->birthdate);
@@ -147,11 +150,21 @@ class RegisterController extends Controller
         return redirect()->route('register.emailVerify');
     }
 
-    public function emailVerify(Request $request)
+    public function emailVerify_create()
     {
-        $request->validate([
-            'token' => 'required|string|size:7'
-        ]);
+        return view('verifyEmail');
+    }
+
+    public function emailVerify_store(Request $request)
+    {
+        switch ($request->token) {
+            case null:
+                return back()->withInput()->withErrors(['token' => 'token is required']);
+            case !is_string($request->token):
+                return back()->withInput()->withErrors(['token' => 'token must be a string']);
+            case strlen($request->token) != 7:
+                return back()->withInput()->withErrors(['token' => 'invalid token']);
+        }
 
         if (!session()->has('needEmailVerification')) {
             return redirect()->route('login');
@@ -164,7 +177,7 @@ class RegisterController extends Controller
         for ($i = 0; $i < count($userTokens); $i++) {
             if ($userTokens[$i]['token'] == hash('sha256', $request->token)) {
                 if (Carbon::parse($userTokens[$i]['expires_at'])->isPast()) {
-                    return back()->withErrors(['token' => 'expired token']);
+                    return back()->withInput()->withErrors(['token' => 'expired token']);
                 }
                 $usuario->misc = json_encode(
                     array_merge(
@@ -180,6 +193,6 @@ class RegisterController extends Controller
                 return redirect()->route('login');
             }
         }
-        return back()->withErrors(['token' => 'invalid token']);
+        return back()->withInput()->withErrors(['token' => 'invalid token']);
     }
 }

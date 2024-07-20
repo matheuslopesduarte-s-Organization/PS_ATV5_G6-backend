@@ -8,14 +8,12 @@ use App\Models\Usuario;
 
 class LoginController extends Controller
 {
-
-    public function showLoginForm()
+    public function create()
     {
         return view('login');
 
     }
-
-    public function login(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'identifier' => 'required',
@@ -23,16 +21,16 @@ class LoginController extends Controller
         ]);
 
         $usuario = Usuario::where('email', $request->identifier)
-                            ->orWhere('username', $request->identifier)
-                            ->first();
+            ->orWhere('username', $request->identifier)
+            ->first();
 
-        if($usuario && hash('sha256', $request->password) == $usuario->senha){
+        if ($usuario && hash('sha256', $request->password) == $usuario->senha) {
             $misc = json_decode($usuario->misc, true);
-            if($misc['status'] != 'active'){
+            if ($misc['status'] != 'active') {
                 return back()->withErrors(['identifier' => 'Usuário bloqueado']);
             }
 
-            if($misc['email_verified'] == false){
+            if ($misc['email_verified'] == false) {
                 return redirect()->route('register.emailVerify');
             }
 
@@ -44,7 +42,7 @@ class LoginController extends Controller
                 'image' => $misc['images']['def'],
                 'birthday' => $usuario->nascimento
             ];
-            if(isset($misc['specialRole'])){
+            if (isset($misc['specialRole'])) {
                 $usuarioInfo['specialRole'] = $misc['specialRole'];
             }
 
@@ -55,7 +53,7 @@ class LoginController extends Controller
         }
 
     }
-    public function logout()
+    public function destroy()
     {
         session()->forget('user');
         return redirect()->route('home');

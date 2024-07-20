@@ -1,6 +1,7 @@
 <!-- resources/views/layouts/layout.blade.php -->
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="/css/main.css">
     @yield('script')
 </head>
+
 <body>
     <header class="header">
         <nav class="navbar">
@@ -15,7 +17,7 @@
                 <button class="menu-button">
                     <span class="menu-icon material-symbols-outlined">menu</span>
                 </button>
-                <div  class="menu-home">
+                <div class="menu-home">
                     <a href="{{ route('home') }}" class="menu-home-span">home</a>
                 </div>
             </div>
@@ -31,7 +33,14 @@
 
             <div class="user-menu">
                 @if (session('user'))
-                    <img class="UserPicture" src="data:image/png;base64, {{ session('user')['image'] }}" alt="Avatar" class="avatar">
+                <img class="UserPicture" src="data:image/png;base64, {{ session('user')['image'] }}" alt="Avatar" class="avatar">
+
+                <div class="user-menu-content">
+                    <a href="">Perfil</a>
+                    <a href="{{ route('users.logout') }}">Sair</a>
+                </div>
+                @else
+                <a href="{{ route('users.login') }}" class="menu-button">Entrar</a>
                 @endif
             </div>
         </nav>
@@ -40,4 +49,5 @@
         @yield('content')
     </main>
 </body>
+
 </html>

@@ -1,10 +1,10 @@
-@extends('layouts.layout');
+@extends('layouts.layout')
 
 @section('title', 'Livros')
 
 @section('content')
 
-    <a href="{{ route('livros.create') }}">Adicionar Livro</a>
+    <a href="{{ route('acervo.livros.create') }}">Adicionar Livro</a>
 
     <h1>Livros</h1>
     <p>Lista de livros</p>

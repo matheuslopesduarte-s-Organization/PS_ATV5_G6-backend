@@ -14,13 +14,13 @@ class LivrosController extends Controller
         $perPage = $request->input("",10);
         $livro = Livro::paginate($perPage);
         
-        return view("acervo/livros", compact("page",""));
+        return view("acervo/livros/livros", ["livros" => $livro]);
 
     }
 
     public function create()
     {
-        return view("acervo/adicionar");
+        return view("acervo/livros/adicionar");
     }
 
     public function store(Request $request)

@@ -147,7 +147,7 @@ class RegisterController extends Controller
         Mail::to($usuario->email)->send(new Email($details, 'Email Verification', 'emails.verification'));
 
         session(['needEmailVerification' => $usuario->email]);
-        return redirect()->route('register.emailVerify');
+        return redirect()->route('users.register.emailVerify');
     }
 
     public function emailVerify_create()
@@ -190,7 +190,7 @@ class RegisterController extends Controller
                 );
                 $usuario->save();
                 session()->forget('needEmailVerification');
-                return redirect()->route('login');
+                return redirect()->route('users.login');
             }
         }
         return back()->withInput()->withErrors(['token' => 'invalid token']);

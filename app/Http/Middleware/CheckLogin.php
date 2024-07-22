@@ -24,7 +24,7 @@ class CheckLogin
             if(json_decode($user->misc, true)['email_verified'] == false){
                 session('needVerify', $user->email);
                 session()->forget('user');
-                return redirect()->route('register.emailVerify');
+                return redirect()->route('users.register.emailVerify');
             }
             
             $userPictures = json_decode($user->misc, true)['images'];
@@ -46,7 +46,7 @@ class CheckLogin
 
         }
         if ($request->session()->has('needEmailVerification')) {
-            return redirect()->route('register.emailVerify');
+            return redirect()->route('users.register.emailVerify');
         }
 
         return $next($request);

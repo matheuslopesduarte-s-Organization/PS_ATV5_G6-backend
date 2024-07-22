@@ -31,7 +31,7 @@ class LoginController extends Controller
             }
 
             if ($misc['email_verified'] == false) {
-                return redirect()->route('register.emailVerify');
+                return redirect()->route('users.register.emailVerify');
             }
 
             $usuarioInfo = [

@@ -41,5 +41,7 @@ class CreateUserPicture
         imagedestroy($image);
 
         return $base64_image;
+
+        // Obs: eu sei que a letra não está centralizada, vou resouver isso depois
     }
 }

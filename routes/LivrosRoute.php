@@ -12,7 +12,3 @@ Route::post('/acervo/livros/adicionar', [LivrosController::class, 'store'])->nam
 Route::patch('/acervo/livros/{livro}', [LivrosController::class, 'update'])->name('acervo.livros.update');
 Route::delete('/acervo/livros/{livro}', [LivrosController::class, 'destroy'])->name('acervo.livros.destroy');
 
-Route::get('/teste', function() {
-    return view('acervo/adicionar');
-
-});

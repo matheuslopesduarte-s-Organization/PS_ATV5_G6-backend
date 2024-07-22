@@ -13,6 +13,12 @@ Route::middleware(CheckLogin::class)->group(function () {
 });
 
 
+// utilizar o laravel jobs para agendar tarefas para que na data e hora especificada, o sistema envie um email para o usuário 
+// informando que o empréstimo está prestes a expirar. 
+// e que o sistema envie um email para o usuário informando que o empréstimo expirou.
+// (((!!! Não tem como pegar o job id para cancelar o job, entao implementar um metodo de cancelar o job no handle dele !!!)))
+
+
 use App\Jobs\EmprestimoExpire;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -34,3 +40,10 @@ Route::get('/schedule', function (Request $request) {
 require __DIR__ . '/LivrosRoute.php';
 require __DIR__ . '/UsersRoute.php';
 require __DIR__ . '/AutoresRoute.php';
+
+
+//teste da janela flutuante
+Route::get('/teste', function() {
+    return view('teste');
+
+});

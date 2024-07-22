@@ -1,3 +1,4 @@
+<!-- teste janela flutuante -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -263,14 +264,23 @@
                     this.popup.style.top = window.innerHeight - this.popup.offsetHeight + 'px';
                 }
 
-                //se janela maior que a tela, then janela = tamanho da tela 
-                /* if (this.popup.style.height > window.innerHeight) {
+                if(this.popup.getBoundingClientRect().left < 0) {
+                    this.popup.style.left = '0px';
+                }
+
+                if(this.popup.getBoundingClientRect().top < 0) {
+                    this.popup.style.top = '0px';
+                }
+
+                if (this.popup.getBoundingClientRect().height > window.innerHeight) {
                     this.popup.style.height = window.innerHeight + 'px';
                 }
-                if (this.popup.style.width > window.innerWidth) {
+                if (this.popup.getBoundingClientRect().width > window.innerWidth) {
                     this.popup.style.width = window.innerWidth + 'px';
                 }
-                    */
+                console.log(this.popup.getBoundingClientRect().height, this.popup.getBoundingClientRect().width);
+                console.log(window.innerHeight, window.innerWidth);
+                    
             });
         }
 
